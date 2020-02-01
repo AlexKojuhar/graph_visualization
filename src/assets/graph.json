@@ -1,0 +1,8 @@
+{
+  "nodes": [
+    {"name": "red"}
+  ],
+  "links": [
+    {"source": "red", "target": "yellow"}
+  ]
+}
