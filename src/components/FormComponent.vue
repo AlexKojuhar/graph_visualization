@@ -47,7 +47,6 @@ export default {
   created() {},
   methods: {
     all_nodes() {
-      console.log("Ni");
       axios.get("http://127.0.0.1:8000/graph/nodes/").then(response => {
         response.data.map(item => {
           this.options.push({ value: item.id, text: item.name });
@@ -63,6 +62,7 @@ export default {
           .post("http://127.0.0.1:8000/graph/nodes/", { name: this.new_node })
           .then(response => {
             if (response.status === 201) {
+              this.$emit("updateGraph", response.data);
               return (this.new_node = "");
             }
             // eslint-disable-next-line no-console
@@ -79,6 +79,7 @@ export default {
           })
           .then(response => {
             if (response.status === 201) {
+              this.$emit("updateGraph", response.data);
               return (
                 (this.selected_source = null), (this.selected_target = null)
               );

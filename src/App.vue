@@ -2,8 +2,10 @@
   <div id="app">
     <b-container fluid>
       <b-row>
-        <b-col cols="3"><Form /></b-col>
-        <b-col cols="9"><Graph :nodes="nodes" :links="links"/></b-col>
+        <b-col cols="3"><Form @updateGraph="update_graph"/></b-col>
+        <b-col cols="9"
+          ><Graph :key="nodes" :nodes="nodes" :links="links"
+        /></b-col>
       </b-row>
     </b-container>
   </div>
@@ -27,14 +29,24 @@ export default {
     };
   },
   beforeMount() {
-    axios.get("http://127.0.0.1:8000/graph/nodes/").then(response => {
-      this.nodes = response.data;
-      console.log(this.nodes);
-    });
-    axios.get("http://127.0.0.1:8000/graph/links/").then(response => {
-      this.links = response.data;
-      console.log(this.links);
-    });
+    this.getLinkNodeData();
+  },
+  methods: {
+    getLinkNodeData() {
+      axios.get("http://127.0.0.1:8000/graph/nodes/").then(response => {
+        this.nodes = response.data;
+        console.log(this.nodes);
+      });
+      axios.get("http://127.0.0.1:8000/graph/links/").then(response => {
+        this.links = response.data;
+        console.log(this.links);
+      });
+    },
+    update_graph(event) {
+      if (event) {
+        this.getLinkNodeData();
+      }
+    }
   }
 };
 </script>
