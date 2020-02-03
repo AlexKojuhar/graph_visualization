@@ -2,9 +2,9 @@
   <div id="app">
     <b-container fluid>
       <b-row>
-        <b-col cols="3"><Form @updateGraph="update_graph"/></b-col>
+        <b-col cols="3"><Form @updateGraph="updateGraph"/></b-col>
         <b-col cols="9"
-          ><Graph :key="nodes" :nodes="nodes" :links="links"
+          ><Graph :key="data_key" :links="data.links" :nodes="data.nodes"
         /></b-col>
       </b-row>
     </b-container>
@@ -24,27 +24,43 @@ export default {
   },
   data() {
     return {
-      nodes: [],
-      links: []
+      data: {
+        nodes: [],
+        links: []
+      },
+      data_key: 0
     };
   },
   beforeMount() {
-    this.getLinkNodeData();
+    this.getNodes();
+    this.getLinks();
   },
   methods: {
-    getLinkNodeData() {
-      axios.get("http://127.0.0.1:8000/graph/nodes/").then(response => {
-        this.nodes = response.data;
-        console.log(this.nodes);
-      });
-      axios.get("http://127.0.0.1:8000/graph/links/").then(response => {
-        this.links = response.data;
-        console.log(this.links);
-      });
+    getNodes() {
+      axios
+        .get(`${this.$hostname}/graph/nodes/`)
+        .then(response => {
+          this.data.nodes = response.data;
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
     },
-    update_graph(event) {
+    getLinks() {
+      axios
+        .get(`${this.$hostname}/graph/links/`)
+        .then(response => {
+          this.data.links = response.data;
+        })
+        .catch(error => {
+          console.log(error.response);
+        });
+    },
+    updateGraph(event) {
       if (event) {
-        this.getLinkNodeData();
+        this.getNodes();
+        this.getLinks();
+        this.data_key = event.id;
       }
     }
   }

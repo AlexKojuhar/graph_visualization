@@ -12,7 +12,9 @@ export default {
     links: { type: Array, default: () => [] }
   },
   data() {
-    return {};
+    return {
+      data: { links: this.links, nodes: this.nodes }
+    };
   },
   watch: {
     links() {

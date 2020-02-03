@@ -7,6 +7,7 @@ import "bootstrap-vue/dist/bootstrap-vue.css";
 Vue.use(BootstrapVue);
 
 Vue.config.productionTip = false;
+Vue.prototype.$hostname = "http://localhost:8000";
 
 new Vue({
   render: h => h(App)

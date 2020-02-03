@@ -4,6 +4,14 @@
       <b-tab title="Create Node" active @click="clean_nodes">
         <div class="mb-1">Node name:</div>
         <b-input v-model="new_node" placeholder="Enter node name" />
+        <b-alert
+          variant="warning"
+          :show="dismissCountDown"
+          dismissible
+          class="mt-2 mb-0"
+          @dismissed="dismissCountDown = 0"
+          >{{ error_message }}</b-alert
+        >
         <b-button class="mt-3" variant="primary" @click="create_node"
           >Create Node</b-button
         >
@@ -41,13 +49,16 @@ export default {
       new_node: "",
       selected_source: null,
       selected_target: null,
-      options: []
+      options: [],
+      error_message: "",
+      dismissSecs: 5,
+      dismissCountDown: 0
     };
   },
   created() {},
   methods: {
     all_nodes() {
-      axios.get("http://127.0.0.1:8000/graph/nodes/").then(response => {
+      axios.get(`${this.$hostname}/graph/nodes/`).then(response => {
         response.data.map(item => {
           this.options.push({ value: item.id, text: item.name });
         });
@@ -59,33 +70,33 @@ export default {
     create_node() {
       if (this.new_node) {
         axios
-          .post("http://127.0.0.1:8000/graph/nodes/", { name: this.new_node })
+          .post(`${this.$hostname}/graph/nodes/`, {
+            name: this.new_node.toLowerCase()
+          })
           .then(response => {
-            if (response.status === 201) {
-              this.$emit("updateGraph", response.data);
-              return (this.new_node = "");
-            }
-            // eslint-disable-next-line no-console
-            console.log(response);
+            this.$emit("updateGraph", response.data);
+            return (this.new_node = "");
+          })
+          .catch(error => {
+            console.log(error.response);
+            this.error_message = "Node with this name already exist";
+            this.dismissCountDown = this.dismissSecs;
           });
       }
     },
     create_link() {
       if (this.selected_source && this.selected_target) {
         axios
-          .post("http://127.0.0.1:8000/graph/links/", {
+          .post(`${this.$hostname}/graph/links/`, {
             source: parseInt(this.selected_source),
             target: parseInt(this.selected_target)
           })
           .then(response => {
-            if (response.status === 201) {
-              this.$emit("updateGraph", response.data);
-              return (
-                (this.selected_source = null), (this.selected_target = null)
-              );
-            }
-            // eslint-disable-next-line no-console
-            console.log(response);
+            this.$emit("updateGraph", response.data);
+            return (this.selected_source = null), (this.selected_target = null);
+          })
+          .catch(error => {
+            console.log(error.response);
           });
       }
     }
